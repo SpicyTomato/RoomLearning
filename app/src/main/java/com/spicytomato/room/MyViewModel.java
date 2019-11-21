@@ -32,4 +32,8 @@ public class MyViewModel extends AndroidViewModel {
     public void deleteAll(){
         wordRepository.deleteAll();
     }
+
+    public void update(Word...words){
+        wordRepository.update(words);
+    }
 }

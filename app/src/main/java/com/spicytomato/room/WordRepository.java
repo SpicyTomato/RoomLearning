@@ -33,6 +33,10 @@ public class WordRepository {
         new DeleteAll(wordDao).execute();
     }
 
+    void update(Word...words){
+        new Update(wordDao).execute(words);
+    }
+
     static class Insert extends AsyncTask<Word,Void,Void>{
         WordDao wordDao;
 
@@ -70,6 +74,18 @@ public class WordRepository {
         @Override
         protected Void doInBackground(Word... words) {
             wordDao.delete(words);
+            return null;
+        }
+    }
+
+    static class Update extends AsyncTask<Word,Void,Void>{
+        WordDao wordDao;
+        Update(WordDao wordDao){
+            this.wordDao = wordDao;
+        }
+        @Override
+        protected Void doInBackground(Word... words) {
+            wordDao.Update(words);
             return null;
         }
     }

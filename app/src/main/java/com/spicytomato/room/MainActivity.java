@@ -28,6 +28,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        aSwitch = findViewById(R.id.switchCard);
+
+        myViewModell = ViewModelProviders.of(this).get(MyViewModel.class);
+
+
+        recyclerView = findViewById(R.id.reclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        myAdapter_normal = new MyAdapter(false,myViewModell);
+        myAdapter_card = new MyAdapter(true,myViewModell);
+        recyclerView.setAdapter(myAdapter_normal);
+
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    recyclerView.setAdapter(myAdapter_card);
+                }else {
+                    recyclerView.setAdapter(myAdapter_normal);
+                }
+            }
+        });
+
 
         buttonInsert = findViewById(R.id.buttonInsert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
@@ -75,20 +97,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        recyclerView = findViewById(R.id.reclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        myAdapter_normal = new MyAdapter(false);
-        recyclerView.setAdapter(myAdapter_normal);
-
-        myViewModell = ViewModelProviders.of(this).get(MyViewModel.class);
-
         myViewModell.getAllWords().observe(this, new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
                 myAdapter_normal.setAllWords(words);
+                myAdapter_card.setAllWords(words);
+                //为什么不能使用 判断总个数是否增加 来调用 notifyDataSetChanged
+                //主要表现为 按键有反应 但是无法更新视图（应该）
                 myAdapter_normal.notifyDataSetChanged();
-//                myAdapter_card.setAllWords(words);
-//                myAdapter_card.notifyDataSetChanged();
+                myAdapter_card.notifyDataSetChanged();
             }
         });
 
