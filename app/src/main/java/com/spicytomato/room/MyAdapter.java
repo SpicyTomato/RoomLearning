@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -38,7 +37,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         if (!isCard) {
             itemView = layoutInflater.inflate(R.layout.cell_normal_2, parent, false);
         }else {
-            itemView = layoutInflater.inflate(R.layout.cell_cardview,parent,false);
+            itemView = layoutInflater.inflate(R.layout.cell_cardview_2,parent,false);
         }
         return new MyViewHolder(itemView);
     }
@@ -50,7 +49,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.textViewNumber.setText(String.valueOf(position+1));
         holder.textViewChineseWord.setText(word.getChineseWord());
         holder.textViewEnglishWord.setText(word.getEnglishWord());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.findViewById(R.id.constraintLayoutWord).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("https://fanyi.baidu.com/translate?aldtype=16047&query=&keyfrom=baidu&smartresult=dict&lang=auto2zh#zh/en/"+holder.textViewEnglishWord.getText());
@@ -107,8 +106,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewNumber = itemView.findViewById(R.id.textViewNumber);
-            textViewEnglishWord = itemView.findViewById(R.id.textViewEnglish);
-            textViewChineseWord = itemView.findViewById(R.id.textViewChinese);
+            textViewEnglishWord = itemView.findViewById(R.id.textViewEnglishWord);
+            textViewChineseWord = itemView.findViewById(R.id.textViewChineseWord);
             //imageButton = itemView.findViewById(R.id.imageButton);
             aSwitchInvisible = itemView.findViewById(R.id.switchInvisible);
         }

@@ -106,6 +106,11 @@ public class MainActivity extends AppCompatActivity {
                 //主要表现为 按键有反应 但是无法更新视图（应该）
                 myAdapter_normal.notifyDataSetChanged();
                 myAdapter_card.notifyDataSetChanged();
+//                if (myAdapter_normal.getItemCount() != words.size()){
+//                    myAdapter_normal.notifyDataSetChanged();
+//                    myAdapter_card.notifyDataSetChanged();
+//                }
+//            }
             }
         });
 

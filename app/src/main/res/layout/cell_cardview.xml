@@ -40,14 +40,14 @@
             app:layout_constraintGuide_percent="0.8" />
 
         <TextView
-            android:id="@+id/textViewEnglish"
+            android:id="@+id/textViewEnglishWord"
             android:layout_width="108dp"
             android:layout_height="26dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/textViewChinese"
+            app:layout_constraintBottom_toTopOf="@+id/textViewChineseWord"
             app:layout_constraintEnd_toStartOf="@+id/guideline8"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline7"
@@ -55,7 +55,7 @@
             tools:text="TextView" />
 
         <TextView
-            android:id="@+id/textViewChinese"
+            android:id="@+id/textViewChineseWord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
@@ -63,8 +63,8 @@
             android:layout_marginBottom="4dp"
             android:text="TextView"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textViewEnglish"
-            app:layout_constraintTop_toBottomOf="@+id/textViewEnglish" />
+            app:layout_constraintStart_toStartOf="@+id/textViewEnglishWord"
+            app:layout_constraintTop_toBottomOf="@+id/textViewEnglishWord" />
 
         <TextView
             android:id="@+id/textViewNumber"
