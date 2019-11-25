@@ -21,6 +21,11 @@ public class WordRepository {
         return AllWords;
     }
 
+    public LiveData<List<Word>> getPartternWord(String parttern){
+        return wordDao.getPatternWord("%" + parttern + "%");
+    }
+
+
     void insert(Word...words){
         new Insert(wordDao).execute(words);
     }

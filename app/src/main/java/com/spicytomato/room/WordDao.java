@@ -26,5 +26,8 @@ public interface WordDao {
     @Update
     void Update(Word...words);
 
+    @Query("SELECT * FROM word WHERE english_word LIKE :pattern ORDER BY id DESC")
+    LiveData<List<Word>> getPatternWord(String pattern);
+
 
 }

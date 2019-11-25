@@ -21,6 +21,10 @@ public class MyViewModel extends AndroidViewModel {
         return wordRepository.AllWords;
     }
 
+    public LiveData<List<Word>> getPatternWord(String parttern){
+        return wordRepository.getPartternWord(parttern);
+    }
+
     public void insert(Word...words){
         wordRepository.insert(words);
     }
