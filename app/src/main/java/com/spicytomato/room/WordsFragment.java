@@ -16,6 +16,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,8 +31,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -44,6 +48,8 @@ public class WordsFragment extends Fragment {
     LiveData<List<Word>> filiterWord;
     private static final String VIEW_TYPE_SHP = "view_type_shp";
     private static final String VIEW_TYPE_CARD = "view_type_card";
+    private List<Word> nowWords;
+    boolean isUndo;
 
     public WordsFragment() {
         // Required empty public constructor
@@ -108,15 +114,16 @@ public class WordsFragment extends Fragment {
                 //一个对象不能同时出现两个 Observe 不然会出现 BUG
                 filiterWord.removeObservers(requireActivity());
                 filiterWord = myViewModel.getPatternWord(pattern);
-                filiterWord.observe(requireActivity(), new Observer<List<Word>>() {
+                filiterWord.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
                     @Override
                     public void onChanged(List<Word> words) {
                         int temp = myAdapter_normal.getItemCount();
-                        myAdapter_normal.setAllWords(words);
-                        myAdapter_card.setAllWords(words);
+                        nowWords = words;
+//                        myAdapter_normal.setAllWords(words);
+//                        myAdapter_card.setAllWords(words);
                         if (temp != words.size()){
-                            myAdapter_normal.notifyDataSetChanged();
-                            myAdapter_card.notifyDataSetChanged();
+                            myAdapter_normal.submitList(words);
+                            myAdapter_card.submitList(words);
                         }
                     }
                 });
@@ -143,6 +150,31 @@ public class WordsFragment extends Fragment {
         recyclerView = activity.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
+        //更新序列号
+        //在动画完成之后设置
+        recyclerView.setItemAnimator(new DefaultItemAnimator(){
+            @Override
+            public void onAnimationFinished(@NonNull RecyclerView.ViewHolder viewHolder) {
+                super.onAnimationFinished(viewHolder);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (linearLayoutManager != null) {
+                    int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
+                    int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
+
+                    for (int i = firstPosition;i<=lastPosition;i++) {
+                        MyAdapter.MyViewHolder holder = (MyAdapter.MyViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+                        if (holder != null) {
+                            holder.textViewNumber.setText(String.valueOf(i + 1));
+                        }
+                    }
+                    if (!isUndo) {
+                        recyclerView.smoothScrollToPosition(0);
+                    }
+                }
+            }
+        });
+        //recyclerView.smoothScrollToPosition(0);
+
         myAdapter_normal = new MyAdapter(false,myViewModel);
         myAdapter_card = new MyAdapter(true,myViewModel);
 
@@ -166,24 +198,62 @@ public class WordsFragment extends Fragment {
         });
 
         filiterWord = myViewModel.getAllWords();
-        filiterWord.observe(activity, new Observer<List<Word>>() {
+        filiterWord.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
                 int temp = myAdapter_normal.getItemCount();
-                myAdapter_normal.setAllWords(words);
-                myAdapter_card.setAllWords(words);
+                nowWords = words;
+//                myAdapter_normal.setAllWords(words);
+//                myAdapter_card.setAllWords(words);
                 if (temp != words.size()){
-                    myAdapter_normal.notifyDataSetChanged();
-                    myAdapter_card.notifyDataSetChanged();
+//                    myAdapter_normal.notifyDataSetChanged();
+//                    myAdapter_card.notifyDataSetChanged();
+//                    myAdapter_normal.notifyItemInserted(0);
+                    if (temp < words.size()){
+                        isUndo = false;
+                    }else {
+                        isUndo = true;
+                    }
+
+                    myAdapter_normal.submitList(words);//提交的数据列表会在后台进行差异比较 根据比较结果来刷新页面
+                    myAdapter_card.submitList(words);
                 }
+//                if (temp < words.size() && !isUndo){
+//                    recyclerView.smoothScrollToPosition(0);
+//                }
+//                isUndo = false;
             }
         });
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.START | ItemTouchHelper.END) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                final Word word = nowWords.get(viewHolder.getAdapterPosition());
+                myViewModel.delete(word);
+                Snackbar.make(requireActivity().findViewById(R.id.fragment_words),"我还不想走",Snackbar.LENGTH_LONG)
+                        .setAction("回来吧", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                isUndo = true;
+                                myViewModel.insert(word);
+                            }
+                        })
+                        .show();
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 
     @Override
     public void onResume() {
         InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(),0);
-        super.onResume();
+        if (inputMethodManager != null && getView() != null) {
+            inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+            super.onResume();
+        }
     }
 }

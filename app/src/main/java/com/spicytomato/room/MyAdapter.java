@@ -10,24 +10,42 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private List<Word> AllWords = new ArrayList<>();
+public class MyAdapter extends ListAdapter<Word,MyAdapter.MyViewHolder> {
+    //private List<Word> AllWords = new ArrayList<>();
     private boolean isCard = false;
     private MyViewModel myViewModel;
 
     MyAdapter(boolean isCard,MyViewModel myViewModel){
+        super(new DiffUtil.ItemCallback<Word>() {
+            @Override
+            //比较元素是否相同
+            public boolean areItemsTheSame(@NonNull Word oldItem, @NonNull Word newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+
+            @Override
+            //如果Item相同 则
+            //比较内容是否相同
+            public boolean areContentsTheSame(@NonNull Word oldItem, @NonNull Word newItem) {
+                return (oldItem.getChineseWord().equals(newItem.getChineseWord())
+                && oldItem.getEnglishWord().equals(newItem.getEnglishWord())
+                && oldItem.isChineseInvisible() == newItem.isChineseInvisible());
+            }
+        });
         this.isCard = isCard;
         this.myViewModel = myViewModel;
     }
 
-    void setAllWords(List<Word> allWords) {
-        AllWords = allWords;
-    }
+//    void setAllWords(List<Word> allWords) {
+//        AllWords = allWords;
+//    }
 
     @NonNull
     @Override
@@ -51,6 +69,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 holder.itemView.getContext().startActivity(intent);
             }
         });
+
+
 
         holder.aSwitchInvisible.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -79,7 +99,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     //如果把监听器 Listener 放到这里面会导致性能降低
     //放到onCreate中比较好
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        final Word word = AllWords.get(position);
+//        final Word word = AllWords.get(position);
+        final Word word = getItem(position);
 
         holder.itemView.setTag(R.id.word_view_holed,word);//参数类型 第一个放key 保证唯一性 创建id来保证
         //setTag 可以放任意一个对象
@@ -133,10 +154,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     }
 
+    //为了解决在后台数据显示到界面上的序号问题
     @Override
-    public int getItemCount() {
-        return AllWords.size();
+    public void onViewAttachedToWindow(@NonNull MyViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        holder.textViewNumber.setText(String.valueOf(holder.getAdapterPosition() + 1));
     }
+
+
+    //    @Override
+//    public int getItemCount() {
+//        return AllWords.size();
+//    }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textViewNumber,textViewEnglishWord,textViewChineseWord;

@@ -55,4 +55,5 @@ public class Word {
     public void setChineseInvisible(boolean chineseInvisible) {
         this.chineseInvisible = chineseInvisible;
     }
+
 }
