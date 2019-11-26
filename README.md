@@ -100,7 +100,22 @@ Search
                 return true;
             }
         });
-
+        
+        
+WordFragment 问题改进：
+                    Observe 中的
+                    
+     * @param owner    The LifecycleOwner which controls the observer
+     * @param observer The observer that will receive the events
+     */
+    @MainThread
+    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) { 
+    
+  
+              第一个参数应该是 LifecycOwner 
+              而 requireActivity 在程序中不会被销毁 所以当每次切换视图创建 Observe 时 会导致多个重叠
+              所以这里应该传递 WordsFragment 的LifecyclerOwner 
+              用getViewLifecyclerOwner()；
 
 
 
