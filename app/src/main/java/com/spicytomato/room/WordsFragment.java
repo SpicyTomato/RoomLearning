@@ -112,7 +112,7 @@ public class WordsFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 String pattern = newText.trim();
                 //一个对象不能同时出现两个 Observe 不然会出现 BUG
-                filiterWord.removeObservers(requireActivity());
+                filiterWord.removeObservers(getViewLifecycleOwner());
                 filiterWord = myViewModel.getPatternWord(pattern);
                 filiterWord.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
                     @Override
